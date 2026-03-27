@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \":*)",
+      "Bash(sed -i 's/O que nossos clientes dizem/O que dizem nossos parceiros?/g' index.html servicos.html sobre-nos.html)",
+      "Bash(sed -i 's/Cliente há mais de 10 anos/Cliente há 14 anos/g' index.html servicos.html sobre-nos.html)",
+      "Bash(sed -i 's/Cliente há mais de 40 anos/Cliente há 47 anos/g' index.html servicos.html sobre-nos.html)",
+      "Bash(sed -i 's/Colaboradora há mais de 30 anos/Colaboradora há 36 anos/g' index.html servicos.html sobre-nos.html)"
+    ]
+  }
+}
