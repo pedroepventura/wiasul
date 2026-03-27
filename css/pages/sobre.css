@@ -345,91 +345,6 @@
   line-height: 1.2;
 }
 
-/* ===== EQUIPE ===== */
-.team-section {
-  padding: var(--section-padding);
-  background: var(--color-gray-100);
-}
-
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 28px;
-}
-
-.team-card {
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  background: var(--color-white);
-  box-shadow: var(--shadow-card);
-  transition: var(--transition-default);
-  position: relative;
-}
-
-.team-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.team-photo {
-  width: 100%;
-  height: 260px;
-  overflow: hidden;
-  position: relative;
-}
-
-.team-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.team-card:hover .team-photo img {
-  transform: scale(1.06);
-}
-
-.team-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(26, 26, 46, 0.9), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-  display: flex;
-  align-items: flex-end;
-  padding: 24px;
-}
-
-.team-card:hover .team-overlay {
-  opacity: 1;
-}
-
-.team-overlay-content {
-  color: var(--color-white);
-}
-
-.team-overlay-content p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.82rem;
-  margin: 0;
-}
-
-.team-info {
-  padding: 20px;
-}
-
-.team-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-dark);
-  margin-bottom: 4px;
-}
-
-.team-role {
-  font-size: 0.82rem;
-  color: var(--color-primary);
-  font-weight: 500;
-}
 
 /* ===== VALORES ===== */
 .valores-section {
@@ -497,10 +412,6 @@
     height: 380px;
   }
 
-  .team-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .valores-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -511,16 +422,12 @@
 }
 
 @media (max-width: 767px) {
-  .sobre-main, .team-section, .valores-section {
+  .sobre-main, .valores-section {
     padding: 60px 0;
   }
 
   .sobre-visual {
     height: 300px;
-  }
-
-  .team-grid {
-    grid-template-columns: 1fr;
   }
 
   .valores-grid {
