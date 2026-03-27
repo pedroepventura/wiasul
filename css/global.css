@@ -298,7 +298,7 @@ p {
 /* ===== PAGE BANNER (páginas internas) ===== */
 .page-banner {
   background: radial-gradient(ellipse at 20% 50%, #2E2E30 0%, #1C1C1E 70%);
-  padding: 140px 0 80px;
+  padding: 116px 0 40px;
   text-align: center;
   position: relative;
   overflow: hidden;
