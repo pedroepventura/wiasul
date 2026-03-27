@@ -23,6 +23,10 @@
   color: var(--color-white);
 }
 
+.header.transparent .nav-logo-text .logo-name {
+  color: var(--color-white);
+}
+
 .header.transparent .nav-logo-text .logo-tagline {
   color: rgba(255, 255, 255, 0.6);
 }
