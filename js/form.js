@@ -1,8 +1,8 @@
 /* ================================================
-   FORM.JS — Validação de Formulários
+   FORM.JS — Validação e Envio via AJAX (Formspree)
    ================================================ */
 
-// ===== FUNÇÕES AUXILIARES (definidas antes do uso) =====
+// ===== FUNÇÕES AUXILIARES =====
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -15,7 +15,6 @@ function isValidPhone(phone) {
 
 function validateField(input) {
   const value = input.value.trim();
-  const type = input.type;
   const errorEl = input.parentElement.querySelector('.form-error');
   let isValid = true;
   let errorMsg = '';
@@ -23,7 +22,7 @@ function validateField(input) {
   if (!value) {
     isValid = false;
     errorMsg = 'Este campo é obrigatório.';
-  } else if (type === 'email' && !isValidEmail(value)) {
+  } else if (input.type === 'email' && !isValidEmail(value)) {
     isValid = false;
     errorMsg = 'Informe um e-mail válido.';
   } else if (input.name === 'telefone' && !isValidPhone(value)) {
@@ -39,9 +38,7 @@ function validateField(input) {
     }
   } else {
     input.classList.remove('error');
-    if (errorEl) {
-      errorEl.classList.remove('visible');
-    }
+    if (errorEl) errorEl.classList.remove('visible');
   }
 
   return isValid;
@@ -51,62 +48,108 @@ function validateField(input) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // ----- Validação de formulários -----
+  // ----- Validação + envio AJAX -----
   var forms = document.querySelectorAll('form[data-validate]');
 
   forms.forEach(function (form) {
     var inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var fieldsEl = form.querySelector('.form-fields');
+    var successEl = form.querySelector('.form-success');
 
     // Validação em tempo real (ao sair do campo)
     inputs.forEach(function (input) {
-      input.addEventListener('blur', function () {
-        validateField(input);
-      });
+      input.addEventListener('blur', function () { validateField(input); });
       input.addEventListener('input', function () {
-        if (input.classList.contains('error')) {
-          validateField(input);
-        }
+        if (input.classList.contains('error')) validateField(input);
       });
     });
 
-    // Submit: bloqueia se inválido; se válido, submete normalmente ao Formspree
     form.addEventListener('submit', function (e) {
-      var isValid = true;
+      e.preventDefault(); // sempre — envio via fetch
 
+      // Valida todos os campos
+      var isValid = true;
       inputs.forEach(function (input) {
-        if (!validateField(input)) {
-          isValid = false;
-        }
+        if (!validateField(input)) isValid = false;
       });
 
       if (!isValid) {
-        e.preventDefault();
-        // Foca no primeiro campo com erro
         var firstError = form.querySelector('input.error, textarea.error, select.error');
         if (firstError) firstError.focus();
         return;
       }
 
-      // Validação passou — NÃO chama preventDefault — formulário envia normalmente para Formspree
+      // --- Envio via fetch ---
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando...';
+      }
+
+      fetch('https://formspree.io/f/mzdkdzrw', {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(function (response) {
+        if (response.ok) {
+          // Sucesso: esconde o formulário, exibe mensagem
+          if (fieldsEl) fieldsEl.style.display = 'none';
+          if (successEl) {
+            successEl.innerHTML =
+              '<svg viewBox="0 0 24 24" style="width:56px;height:56px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-bottom:12px">' +
+                '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' +
+              '</svg>' +
+              '<h3 style="margin-bottom:8px">Mensagem enviada com sucesso!</h3>' +
+              '<p style="margin-bottom:24px">Obrigado pelo contato. Retornaremos em breve.</p>' +
+              '<button class="btn btn-primary" id="btn-nova-msg-' + form.id + '">Enviar nova mensagem</button>';
+            successEl.classList.add('visible');
+            successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Botão "nova mensagem": restaura o formulário
+            var btnNova = document.getElementById('btn-nova-msg-' + form.id);
+            if (btnNova) {
+              btnNova.addEventListener('click', function () {
+                form.reset();
+                inputs.forEach(function (input) {
+                  input.classList.remove('error');
+                  var err = input.parentElement.querySelector('.form-error');
+                  if (err) err.classList.remove('visible');
+                });
+                successEl.classList.remove('visible');
+                successEl.innerHTML = '';
+                if (fieldsEl) fieldsEl.style.display = '';
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.textContent = 'Enviar Mensagem';
+                }
+              });
+            }
+          }
+        } else {
+          // Erro HTTP do Formspree
+          showFormError(form, submitBtn);
+        }
+      })
+      .catch(function () {
+        showFormError(form, submitBtn);
+      });
     });
   });
 
-  // ----- Verificação ?enviado=true (retorno do Formspree) -----
-  if (new URLSearchParams(window.location.search).get('enviado') === 'true') {
-    var targetForm = document.querySelector('form[data-validate]');
-    if (targetForm) {
-      var fields = targetForm.querySelector('.form-fields');
-      var success = targetForm.querySelector('.form-success');
-      if (fields) fields.style.display = 'none';
-      if (success) {
-        success.innerHTML =
-          '<svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
-          '<h3>Mensagem enviada com sucesso!</h3>' +
-          '<p>Retornaremos em breve.</p>' +
-          '<button class="btn btn-primary" style="margin-top:16px" onclick="window.location.href=window.location.pathname">Enviar nova mensagem</button>';
-        success.classList.add('visible');
-        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+  function showFormError(form, submitBtn) {
+    var existing = form.querySelector('.form-send-error');
+    if (!existing) {
+      var errDiv = document.createElement('p');
+      errDiv.className = 'form-send-error';
+      errDiv.style.cssText = 'color:#e74c3c;font-size:0.9rem;margin-top:12px;text-align:center';
+      errDiv.textContent = 'Erro ao enviar a mensagem. Por favor, tente novamente.';
+      var submitBtn2 = form.querySelector('button[type="submit"]');
+      if (submitBtn2) submitBtn2.insertAdjacentElement('afterend', errDiv);
+    }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar Mensagem';
     }
   }
 
@@ -116,20 +159,18 @@ document.addEventListener('DOMContentLoaded', function () {
     input.addEventListener('input', function (e) {
       var value = e.target.value.replace(/\D/g, '');
       if (value.length > 11) value = value.slice(0, 11);
-
       if (value.length <= 10) {
         value = value.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
       } else {
         value = value.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
       }
-
       e.target.value = value;
     });
   });
 
 });
 
-// Estilo para ícone girando no loading
+// Estilo de animação (spin — caso necessário em loading futuro)
 var spinStyle = document.createElement('style');
 spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } } .spin { animation: spin 0.8s linear infinite; }';
 document.head.appendChild(spinStyle);
