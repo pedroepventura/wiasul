@@ -44,7 +44,7 @@ function renderPostCard(post) {
         <span class="post-card__date">${date}</span>
         <h3 class="post-card__title">${title}</h3>
         <p class="post-card__excerpt">${excerpt}</p>
-        <a href="post.html?slug=${slug}" class="post-card__link">Ler mais →</a>
+        <a href="/post/?slug=${slug}" class="post-card__link">Ler mais →</a>
       </div>
     </article>
   `;

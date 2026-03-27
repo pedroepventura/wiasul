@@ -13,7 +13,7 @@
 
   // Configurar link de voltar
   if (backLink) {
-    backLink.href = 'blog.html';
+    backLink.href = '/blog/';
     backLink.textContent = '← Voltar para o Blog';
   }
 
@@ -57,7 +57,7 @@
         <div class="posts-message posts-error">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
           <p>Não foi possível carregar o post. Tente novamente mais tarde.</p>
-          <a href="blog.html" class="btn btn-outline" style="margin-top: 16px;">Voltar para o Blog</a>
+          <a href="/blog/" class="btn btn-outline" style="margin-top: 16px;">Voltar para o Blog</a>
         </div>
       `;
     }
@@ -101,7 +101,7 @@
       <div class="posts-message posts-empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <p>Post não encontrado.</p>
-        <a href="blog.html" class="btn btn-outline" style="margin-top: 16px;">Voltar para o Blog</a>
+        <a href="/blog/" class="btn btn-outline" style="margin-top: 16px;">Voltar para o Blog</a>
       </div>
     `;
   }
@@ -133,7 +133,7 @@
         const date = new Date(p.date).toLocaleDateString('pt-BR');
         const title = p.title.rendered;
         return `
-          <a href="post.html?slug=${p.slug}" class="recent-post-item">
+          <a href="/post/?slug=${p.slug}" class="recent-post-item">
             <div class="recent-post-img">
               <img src="${img}" alt="${title}" loading="lazy">
             </div>
