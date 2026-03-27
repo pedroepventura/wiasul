@@ -20,9 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Submit
+    // Submit — bloqueia apenas se inválido; se válido, submete ao Formspree
     form.addEventListener('submit', (e) => {
-      e.preventDefault();
       let isValid = true;
 
       inputs.forEach(input => {
@@ -31,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      if (isValid) {
-        simulateSubmit(form, successMsg);
+      if (!isValid) {
+        e.preventDefault();
       }
     });
   });
@@ -85,38 +84,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return cleaned.length >= 10 && cleaned.length <= 11;
   }
 
-  function simulateSubmit(form, successMsg) {
-    const submitBtn = form.querySelector('[type="submit"]');
-    if (submitBtn) {
-      const originalText = submitBtn.innerHTML;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin">
-          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-        </svg>
-        Enviando...
-      `;
-
-      setTimeout(() => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-        form.reset();
-
-        // Mostrar mensagem de sucesso
-        if (successMsg) {
-          form.querySelector('.form-fields')
-            ? (form.querySelector('.form-fields').style.display = 'none')
-            : null;
-          successMsg.classList.add('visible');
-          successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-          setTimeout(() => {
-            successMsg.classList.remove('visible');
-            const fields = form.querySelector('.form-fields');
-            if (fields) fields.style.display = '';
-          }, 5000);
-        }
-      }, 1500);
+  // ===== VERIFICAÇÃO ?enviado=true (retorno do Formspree) =====
+  if (new URLSearchParams(window.location.search).get('enviado') === 'true') {
+    const targetForm = document.querySelector('form[data-validate]');
+    if (targetForm) {
+      const fields = targetForm.querySelector('.form-fields');
+      const success = targetForm.querySelector('.form-success');
+      if (fields) fields.style.display = 'none';
+      if (success) {
+        success.innerHTML = `
+          <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <h3>Mensagem enviada com sucesso!</h3>
+          <p>Retornaremos em breve.</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="window.location.href=window.location.pathname">Enviar nova mensagem</button>
+        `;
+        success.classList.add('visible');
+        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
   }
 
